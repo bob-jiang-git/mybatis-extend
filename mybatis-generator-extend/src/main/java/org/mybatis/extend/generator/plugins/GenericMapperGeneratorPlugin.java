@@ -1,10 +1,7 @@
 package org.mybatis.extend.generator.plugins;
 
 import org.mybatis.generator.api.*;
-import org.mybatis.generator.api.dom.java.CompilationUnit;
-import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
-import org.mybatis.generator.api.dom.java.Interface;
-import org.mybatis.generator.api.dom.java.JavaVisibility;
+import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.Document;
 import org.mybatis.generator.api.dom.xml.TextElement;
@@ -147,9 +144,53 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
         return extXmlFiles;
     }
 
+    /**
+     * 修改mapper xml的namespace
+     *
+     * @param document
+     * @param introspectedTable
+     * @return
+     */
     public boolean sqlMapDocumentGenerated(Document document, IntrospectedTable introspectedTable) {
         String nameSpace = mapperTargetPackage + "." + introspectedTable.getTableConfiguration().getDomainObjectName() + "Mapper";
         introspectedTable.setMyBatis3FallbackSqlMapNamespace(nameSpace);
         return true;
+    }
+
+    /** return false; 不生成Example相关代码 */
+
+    public boolean modelExampleClassGenerated(
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapExampleWhereClauseElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapSelectByExampleWithoutBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapDeleteByExampleElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapCountByExampleElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapUpdateByExampleSelectiveElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapUpdateByExampleWithoutBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
     }
 }
