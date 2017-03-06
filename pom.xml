@@ -19,6 +19,7 @@
         <module>mybatis-generic</module>
         <module>mybatis-generator-extend</module>
         <module>mybatis-demo</module>
+        <module>mybatis-page</module>
     </modules>
 
 </project>

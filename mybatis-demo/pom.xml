@@ -62,5 +62,11 @@
             <artifactId>mybatis-generic</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mybatis.extend</groupId>
+            <artifactId>mybatis-page</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

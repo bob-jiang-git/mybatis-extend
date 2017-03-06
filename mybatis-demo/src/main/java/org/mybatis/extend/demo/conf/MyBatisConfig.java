@@ -1,7 +1,9 @@
 package org.mybatis.extend.demo.conf;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.extend.page.interceptor.PageInterceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
@@ -36,6 +38,9 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource());
         bean.setTypeAliasesPackage("org.mybatis.extend.demo.model");
+
+        bean.setPlugins(new Interceptor[] {new PageInterceptor()});
+
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         bean.setMapperLocations(resolver.getResources("classpath*:mapper/**/*.xml"));
         return bean.getObject();
