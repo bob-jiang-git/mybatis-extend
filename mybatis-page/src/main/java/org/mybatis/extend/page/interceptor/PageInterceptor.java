@@ -9,6 +9,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.mybatis.extend.page.Dialect;
 import org.mybatis.extend.page.annotation.Pagination;
+import org.mybatis.extend.page.constant.PageConstant;
+import org.mybatis.extend.page.result.PageResult;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
@@ -24,8 +26,6 @@ import java.util.Properties;
         args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})
 })
 public class PageInterceptor implements Interceptor {
-
-    private static final String DEFAULT_DIALECT_CLASS = "org.mybatis.extend.page.dialect.MySqlGenericDialect";
 
     private Dialect dialect;
     private Field parametersField;
@@ -44,15 +44,17 @@ public class PageInterceptor implements Interceptor {
         if (pagination != null) {
 
             Map<String, Object> additionalParameters = (Map<String, Object>) parametersField.get(boundSql);
-            doCount(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters);
+            PageResult pageResult = doCount(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters);
 
-            CacheKey cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
-            String pageSql = dialect.getPageSql(ms, boundSql, parameter, rowBounds);
+            if (pageResult.getTotalRows() > 0) {
+                doPage(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters, pageResult);
+                return pageResult;
+            }
         }
         return invocation.proceed();
     }
 
-    private Long doCount(Executor executor, MappedStatement ms, Object parameter,
+    private PageResult doCount(Executor executor, MappedStatement ms, Object parameter,
             RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql,
             Map<String, Object> additionalParameters) throws SQLException {
 
@@ -72,7 +74,21 @@ public class PageInterceptor implements Interceptor {
 
         List countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
         Long count = (Long) countResultList.get(0);
-        return count;
+
+        PageResult pageResult = new PageResult();
+        pageResult.setTotalRows(count.intValue());
+        return pageResult;
+    }
+
+    private PageResult doPage(Executor executor, MappedStatement ms, Object parameter,
+            RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql,
+            Map<String, Object> additionalParameters, PageResult pageResult) {
+
+        CacheKey cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
+        String pageSql = dialect.getPageSql(ms, boundSql, parameter, rowBounds);
+
+        pageResult.setData(null);
+        return pageResult;
     }
 
     public Object plugin(Object target) {
@@ -83,7 +99,7 @@ public class PageInterceptor implements Interceptor {
         try {
             String dialectClass = properties.getProperty("dialect");
             if (dialectClass == null || "".equals(dialectClass)) {
-                dialectClass = DEFAULT_DIALECT_CLASS;
+                dialectClass = PageConstant.DEFAULT_DIALECT_CLASS;
             }
 
             Class<?> aClass = Class.forName(dialectClass);

@@ -7,4 +7,6 @@ public interface PageConstant {
 
     int PAGE_SIZE = 10;
 
+    String DEFAULT_DIALECT_CLASS = "org.mybatis.extend.page.dialect.MySqlGenericDialect";
+
 }
