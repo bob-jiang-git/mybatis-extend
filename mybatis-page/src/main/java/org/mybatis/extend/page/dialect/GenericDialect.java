@@ -4,32 +4,41 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.RowBounds;
-import org.mybatis.extend.page.Dialect;
 import org.mybatis.extend.page.annotation.Pagination;
-import org.mybatis.extend.page.parser.CountSqlParser;
+import org.mybatis.extend.page.param.Page;
+import org.mybatis.extend.page.result.PageList;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Bob Jiang on 2017/3/6.
  */
 public abstract class GenericDialect implements Dialect {
 
-    protected CountSqlParser countSqlParser = new CountSqlParser();
-
-    @Override
     public Pagination getPagination(String msId) {
         try {
             Class clazz = Class.forName(msId.substring(0, msId.lastIndexOf(".")));
-            Method method = clazz.getMethod(msId.substring(msId.lastIndexOf(".") + 1, msId.length()), null);
-            return method.getAnnotation(Pagination.class);
-        } catch (Exception e) {
-            return null;
-        }
+            String methodName = msId.substring(msId.lastIndexOf(".") + 1, msId.length());
+
+            Method[] methods = clazz.getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals(methodName)) {
+                    Pagination pagination = method.getAnnotation(Pagination.class);
+                    if (pagination.value()) {
+                        return pagination;
+                    }
+                }
+            }
+        } catch (Exception e) { }
+        return null;
     }
 
-    @Override
     public boolean canBePaged(MappedStatement ms, String sql) {
+        if (getPagination(ms.getId()) == null) {
+            return false;
+        }
         SqlCommandType sqlCommandType = ms.getSqlCommandType();
         if (SqlCommandType.SELECT == sqlCommandType) {
             if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
@@ -41,18 +50,40 @@ public abstract class GenericDialect implements Dialect {
         return true;
     }
 
-    @Override
-    public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds) {
-        String sql = boundSql.getSql();
-        canBePaged(ms, sql);
-        return countSqlParser.getCountSql(sql);
+    public BoundSql getCountSql(MappedStatement ms, BoundSql boundSql, Object parameter,
+            RowBounds rowBounds, Map<String, Object> additionalParameters) {
+        String countSql = getCountSql(boundSql.getSql());
+
+        BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameter);
+        for (String key : additionalParameters.keySet()) {
+            countBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
+        }
+        return countBoundSql;
     }
 
-    @Override
-    public String getPageSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds) {
-        return getPageSql(boundSql.getSql(), rowBounds);
+    public BoundSql getPageSql(MappedStatement ms, BoundSql boundSql, Object parameter,
+             RowBounds rowBounds, Map<String, Object> additionalParameters) {
+
+        String pageSql = getPageSql(boundSql.getSql(), rowBounds);
+
+        BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameter);
+        for (String key : additionalParameters.keySet()) {
+            pageBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
+        }
+        return pageBoundSql;
+    }
+
+    public PageList buildPageList(List resultList, Page page, int totalRows) {
+        PageList pageResult = new PageList();
+        pageResult.addAll(resultList);
+        pageResult.setPageNum(page.getPageNum());
+        pageResult.setPageSize(page.getPageSize());
+        pageResult.setTotalRows(totalRows);
+        return pageResult;
     }
 
     public abstract String getPageSql(String sql, RowBounds rowBounds);
+
+    public abstract String getCountSql(String sql);
 
 }

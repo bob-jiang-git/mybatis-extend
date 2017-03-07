@@ -1,13 +1,14 @@
 package org.mybatis.extend.page.result;
 
-import org.mybatis.extend.page.Page;
-
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Bob Jiang on 2017/3/6.
  */
-public class PageResult<T> {
+public class PageResult<T> implements Serializable {
+
+    private static final long serialVersionUID = 6452924799509915636L;
 
     private int pageSize;
     private int pageNum;
@@ -15,18 +16,24 @@ public class PageResult<T> {
     private int totalRows;
     private List<T> data;
 
-    public PageResult() { }
-
-    public PageResult(List<T> data) {
-        this.data = data;
+    public PageResult(List<T> list) {
+        PageList pageList = (PageList) list;
+        this.pageNum = pageList.getPageNum();
+        this.pageSize = pageList.getPageSize();
+        this.totalRows = pageList.getTotalRows();
+        this.totalPage = pageList.getTotalPage();
+        this.data = pageList;
     }
 
-    public PageResult(Page page, List<T> data) {
-        this.pageSize = page.getPageSize();
-        this.pageNum = page.getPageNum();
-        this.totalPage = page.getTotalPage();
-        this.totalRows = page.getTotalRows();
-        this.data = data;
+    @Override
+    public String toString() {
+        return "PageResult{" +
+                "pageSize=" + pageSize +
+                ", pageNum=" + pageNum +
+                ", totalPage=" + totalPage +
+                ", totalRows=" + totalRows +
+                ", data=" + data +
+                '}';
     }
 
     public int getPageSize() {

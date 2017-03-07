@@ -1,7 +1,5 @@
 package org.mybatis.extend.page.annotation;
 
-import org.mybatis.extend.page.constant.PageConstant;
-
 import java.lang.annotation.*;
 
 /**
@@ -12,10 +10,9 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Pagination {
 
-    int pageSize() default PageConstant.PAGE_SIZE;
-
-    String order();
+    boolean value() default true;
 
 }

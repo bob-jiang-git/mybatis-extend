@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Created by Bob Jiang on 2017/2/25.
@@ -39,7 +40,10 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         bean.setDataSource(dataSource());
         bean.setTypeAliasesPackage("org.mybatis.extend.demo.model");
 
-        bean.setPlugins(new Interceptor[] {new PageInterceptor()});
+        Properties properties = new Properties();
+        PageInterceptor pageInterceptor = new PageInterceptor();
+        pageInterceptor.setProperties(properties);
+        bean.setPlugins(new Interceptor[] {pageInterceptor});
 
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         bean.setMapperLocations(resolver.getResources("classpath*:mapper/**/*.xml"));

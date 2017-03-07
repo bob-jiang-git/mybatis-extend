@@ -7,10 +7,14 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.mybatis.extend.page.Dialect;
-import org.mybatis.extend.page.annotation.Pagination;
 import org.mybatis.extend.page.constant.PageConstant;
-import org.mybatis.extend.page.result.PageResult;
+import org.mybatis.extend.page.dialect.Dialect;
+import org.mybatis.extend.page.cache.Cache;
+import org.mybatis.extend.page.cache.SimpleCache;
+import org.mybatis.extend.page.constant.DialectInfo;
+import org.mybatis.extend.page.param.Page;
+import org.mybatis.extend.page.result.PageList;
+import org.mybatis.extend.page.util.MSUtils;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
@@ -29,6 +33,7 @@ public class PageInterceptor implements Interceptor {
 
     private Dialect dialect;
     private Field parametersField;
+    private Cache<CacheKey, MappedStatement> msCache;
 
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
@@ -40,55 +45,55 @@ public class PageInterceptor implements Interceptor {
         Executor executor           = (Executor) invocation.getTarget();
         BoundSql boundSql           = ms.getBoundSql(parameter);
 
-        Pagination pagination = dialect.getPagination(ms.getId());
-        if (pagination != null) {
+        if (dialect.canBePaged(ms, boundSql.getSql())) {
 
             Map<String, Object> additionalParameters = (Map<String, Object>) parametersField.get(boundSql);
-            PageResult pageResult = doCount(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters);
+            int totalRows = queryCount(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters);
 
-            if (pageResult.getTotalRows() > 0) {
-                doPage(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters, pageResult);
-                return pageResult;
+            if (totalRows > 0) {
+                return queryPage(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters, totalRows);
             }
         }
         return invocation.proceed();
     }
 
-    private PageResult doCount(Executor executor, MappedStatement ms, Object parameter,
+    private int queryCount(Executor executor, MappedStatement ms, Object parameter,
             RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql,
             Map<String, Object> additionalParameters) throws SQLException {
 
         CacheKey countKey = executor.createCacheKey(ms, parameter, RowBounds.DEFAULT, boundSql);
-        countKey.update("_Count");
-        MappedStatement countMs = (MappedStatement) ms.getCache().getObject(countKey);
+        countKey.update("_count");
+        MappedStatement countMs = msCache.get(countKey);
         if (countMs == null) {
-            countMs = ms;
-            ms.getCache().putObject(countKey, ms);
+            countMs = MSUtils.newCountMappedStatement(ms);
+            msCache.put(countKey, countMs);
         }
 
-        String countSql = dialect.getCountSql(ms, boundSql, parameter, rowBounds);
-        BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameter);
-        for (String key : additionalParameters.keySet()) {
-            countBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
-        }
+        BoundSql countSql = dialect.getCountSql(ms, boundSql, parameter, rowBounds, additionalParameters);
 
-        List countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
-        Long count = (Long) countResultList.get(0);
-
-        PageResult pageResult = new PageResult();
-        pageResult.setTotalRows(count.intValue());
-        return pageResult;
+        List countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countSql);
+        Integer count = (Integer) countResultList.get(0);
+        return count.intValue();
     }
 
-    private PageResult doPage(Executor executor, MappedStatement ms, Object parameter,
+    private PageList queryPage(Executor executor, MappedStatement ms, Object parameter,
             RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql,
-            Map<String, Object> additionalParameters, PageResult pageResult) {
+            Map<String, Object> additionalParameters, int totalRows) throws SQLException {
 
-        CacheKey cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
-        String pageSql = dialect.getPageSql(ms, boundSql, parameter, rowBounds);
+        Page page = null;
+        RowBounds pageRowBounds = rowBounds;
+        if (parameter instanceof Map) {
+            Map map = (Map) parameter;
+            page = (Page) map.get(PageConstant.PAGE_KEY);
+            pageRowBounds = page.toRowBounds();
+        }
 
-        pageResult.setData(null);
-        return pageResult;
+        CacheKey cacheKey = executor.createCacheKey(ms, parameter, pageRowBounds, boundSql);
+
+        BoundSql pageBoundSql = dialect.getPageSql(ms, boundSql, parameter, pageRowBounds, additionalParameters);
+        List resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, pageBoundSql);
+
+        return dialect.buildPageList(resultList, page, totalRows);
     }
 
     public Object plugin(Object target) {
@@ -97,22 +102,18 @@ public class PageInterceptor implements Interceptor {
 
     public void setProperties(Properties properties) {
         try {
-            String dialectClass = properties.getProperty("dialect");
-            if (dialectClass == null || "".equals(dialectClass)) {
-                dialectClass = PageConstant.DEFAULT_DIALECT_CLASS;
-            }
+            String dialectName = properties.getProperty("dialect");
+            Class dialectClass = DialectInfo.getClazzByName(dialectName);
 
-            Class<?> aClass = Class.forName(dialectClass);
-            dialect = (Dialect) aClass.newInstance();
+            dialect = (Dialect) dialectClass.newInstance();
+
+            parametersField = BoundSql.class.getDeclaredField("additionalParameters");
+            parametersField.setAccessible(true);
+
+            msCache = new SimpleCache<CacheKey, MappedStatement>(properties, "ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        try {
-            parametersField = BoundSql.class.getDeclaredField("additionalParameters");
-            parametersField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
     }
+
 }
