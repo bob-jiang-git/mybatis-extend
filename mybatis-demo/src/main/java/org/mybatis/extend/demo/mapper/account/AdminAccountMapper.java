@@ -4,7 +4,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.mybatis.extend.demo.model.account.AdminAccount;
 import org.mybatis.extend.generic.mapper.GenericMapper;
-import org.mybatis.extend.page.annotation.Pagination;
 import org.mybatis.extend.page.constant.PageConstant;
 import org.mybatis.extend.page.param.Page;
 
@@ -19,7 +18,6 @@ import java.util.List;
 */
 public interface AdminAccountMapper extends GenericMapper<AdminAccount, Integer> {
 
-    @Pagination
     @Select("select * from admin_account where role_ids = #{roleIds}")
     List<AdminAccount> getAll(@Param("roleIds") String roleIds, @Param(PageConstant.PAGE_KEY) Page page);
 }

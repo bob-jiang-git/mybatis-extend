@@ -17,12 +17,16 @@ public class PageResult<T> implements Serializable {
     private List<T> data;
 
     public PageResult(List<T> list) {
-        PageList pageList = (PageList) list;
-        this.pageNum = pageList.getPageNum();
-        this.pageSize = pageList.getPageSize();
-        this.totalRows = pageList.getTotalRows();
-        this.totalPage = pageList.getTotalPage();
-        this.data = pageList;
+        if (list instanceof PageList) {
+            PageList pageList = (PageList) list;
+            this.pageNum = pageList.getPageNum();
+            this.pageSize = pageList.getPageSize();
+            this.totalRows = pageList.getTotalRows();
+            this.totalPage = pageList.getTotalPage();
+            this.data = pageList;
+        } else {
+            throw new RuntimeException("construct PageResult failed, input parameter type error!");
+        }
     }
 
     @Override

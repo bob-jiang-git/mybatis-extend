@@ -9,4 +9,6 @@ public interface PageConstant {
 
     String PAGE_KEY = "page";
 
+    String DIALECT = "dialect";
+
 }

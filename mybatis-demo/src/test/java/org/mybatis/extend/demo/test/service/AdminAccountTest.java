@@ -27,6 +27,8 @@ public class AdminAccountTest extends BaseTest {
         List<AdminAccount> list = adminAccountMapper.getAll("1", new Page(1));
         PageResult<AdminAccount> pageResult = new PageResult<AdminAccount>(list);
         System.out.println(pageResult);
+
+        select();
     }
 
     @Test

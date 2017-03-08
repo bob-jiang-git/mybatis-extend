@@ -1,5 +1,6 @@
 package org.mybatis.extend.page.dialect;
 
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
@@ -16,13 +17,15 @@ import java.util.Map;
  */
 public interface Dialect {
 
-    boolean canBePaged(MappedStatement ms, String sql);
+    boolean canBePaged(MappedStatement ms, String sql, Object parameter);
+
+    Page getPageParameter(Object parameter);
 
     BoundSql getCountSql(MappedStatement ms, BoundSql boundSql, Object parameter,
-                       RowBounds rowBounds, Map<String, Object> additionalParameters);
+                        Map<String, Object> additionalParameters);
 
     BoundSql getPageSql(MappedStatement ms, BoundSql boundSql, Object parameter,
-                      RowBounds rowBounds, Map<String, Object> additionalParameters);
+                        CacheKey pageKey, RowBounds rowBounds, Map<String, Object> additionalParameters);
 
     PageList buildPageList(List resultList, Page page, int totalRows);
 }

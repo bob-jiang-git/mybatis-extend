@@ -24,9 +24,7 @@
 
 package org.mybatis.extend.page.cache;
 
-/**
- * Created by Bob Jiang on 2017/3/6.
- */
+
 public interface Cache<K, V> {
 
     V get(K key);

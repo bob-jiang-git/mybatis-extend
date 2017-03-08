@@ -2,9 +2,10 @@ package org.mybatis.extend.page.result;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 分页结果集
+ * 分页结果集，此容器的目的是在Mapper返回数据中加入分页信息，目的最终结果为PageResult
  *
  * Created by Bob Jiang on 2017/3/6.
  */
@@ -16,6 +17,13 @@ public class PageList<T> extends ArrayList<T> {
     private int pageNum;
     private int totalPage;
     private int totalRows;
+
+    public PageList(List<T> list, int pageNum, int pageSize, int totalRows) {
+        this.addAll(list);
+        this.pageNum = pageNum;
+        this.pageSize = pageSize;
+        this.totalRows = totalRows;
+    }
 
     public int getPageSize() {
         return pageSize;

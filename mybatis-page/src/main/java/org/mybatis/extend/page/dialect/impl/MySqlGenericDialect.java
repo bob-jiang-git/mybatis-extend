@@ -1,5 +1,6 @@
 package org.mybatis.extend.page.dialect.impl;
 
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
 import org.mybatis.extend.page.dialect.GenericDialect;
 import org.mybatis.extend.page.util.StringTools;
@@ -11,7 +12,8 @@ import org.mybatis.extend.page.util.StringTools;
 public class MySqlGenericDialect extends GenericDialect {
 
     @Override
-    public String getPageSql(String sql, RowBounds rowBounds) {
+    public String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey) {
+        pageKey.update(rowBounds.getLimit());
         return StringTools.append(sql, " limit ", rowBounds.getOffset(), " , ", rowBounds.getLimit());
     }
 

@@ -31,9 +31,7 @@ import org.mybatis.extend.page.util.StringTools;
 
 import java.util.Properties;
 
-/**
- * Created by Bob Jiang on 2017/3/6.
- */
+
 public class SimpleCache<K, V> implements Cache<K, V> {
 
     private final org.apache.ibatis.cache.Cache CACHE;

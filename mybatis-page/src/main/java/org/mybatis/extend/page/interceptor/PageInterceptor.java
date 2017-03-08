@@ -7,22 +7,24 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.mybatis.extend.page.constant.PageConstant;
 import org.mybatis.extend.page.dialect.Dialect;
 import org.mybatis.extend.page.cache.Cache;
 import org.mybatis.extend.page.cache.SimpleCache;
-import org.mybatis.extend.page.constant.DialectInfo;
+import org.mybatis.extend.page.dialect.GenericDialect;
 import org.mybatis.extend.page.param.Page;
 import org.mybatis.extend.page.result.PageList;
 import org.mybatis.extend.page.util.MSUtils;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 /**
+ * 核心拦截器
+ *
  * Created by Bob Jiang on 2017/3/6.
  */
 @Intercepts({
@@ -45,20 +47,22 @@ public class PageInterceptor implements Interceptor {
         Executor executor           = (Executor) invocation.getTarget();
         BoundSql boundSql           = ms.getBoundSql(parameter);
 
-        if (dialect.canBePaged(ms, boundSql.getSql())) {
+        if (dialect.canBePaged(ms, boundSql.getSql(), parameter)) {
 
             Map<String, Object> additionalParameters = (Map<String, Object>) parametersField.get(boundSql);
-            int totalRows = queryCount(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters);
+            int totalRows = queryCount(executor, ms, parameter, resultHandler, boundSql, additionalParameters);
 
             if (totalRows > 0) {
-                return queryPage(executor, ms, parameter, rowBounds, resultHandler, boundSql, additionalParameters, totalRows);
+                return queryPage(executor, ms, parameter, resultHandler, boundSql, additionalParameters, totalRows);
+            } else {
+                return dialect.buildPageList(new ArrayList(), new Page(), totalRows);
             }
         }
         return invocation.proceed();
     }
 
     private int queryCount(Executor executor, MappedStatement ms, Object parameter,
-            RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql,
+            ResultHandler resultHandler, BoundSql boundSql,
             Map<String, Object> additionalParameters) throws SQLException {
 
         CacheKey countKey = executor.createCacheKey(ms, parameter, RowBounds.DEFAULT, boundSql);
@@ -69,7 +73,7 @@ public class PageInterceptor implements Interceptor {
             msCache.put(countKey, countMs);
         }
 
-        BoundSql countSql = dialect.getCountSql(ms, boundSql, parameter, rowBounds, additionalParameters);
+        BoundSql countSql = dialect.getCountSql(ms, boundSql, parameter, additionalParameters);
 
         List countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countSql);
         Integer count = (Integer) countResultList.get(0);
@@ -77,20 +81,15 @@ public class PageInterceptor implements Interceptor {
     }
 
     private PageList queryPage(Executor executor, MappedStatement ms, Object parameter,
-            RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql,
+            ResultHandler resultHandler, BoundSql boundSql,
             Map<String, Object> additionalParameters, int totalRows) throws SQLException {
 
-        Page page = null;
-        RowBounds pageRowBounds = rowBounds;
-        if (parameter instanceof Map) {
-            Map map = (Map) parameter;
-            page = (Page) map.get(PageConstant.PAGE_KEY);
-            pageRowBounds = page.toRowBounds();
-        }
+        Page page = dialect.getPageParameter(parameter);
+        RowBounds pageRowBounds = page.toRowBounds();
 
         CacheKey cacheKey = executor.createCacheKey(ms, parameter, pageRowBounds, boundSql);
 
-        BoundSql pageBoundSql = dialect.getPageSql(ms, boundSql, parameter, pageRowBounds, additionalParameters);
+        BoundSql pageBoundSql = dialect.getPageSql(ms, boundSql, parameter, cacheKey, pageRowBounds, additionalParameters);
         List resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, pageBoundSql);
 
         return dialect.buildPageList(resultList, page, totalRows);
@@ -102,10 +101,7 @@ public class PageInterceptor implements Interceptor {
 
     public void setProperties(Properties properties) {
         try {
-            String dialectName = properties.getProperty("dialect");
-            Class dialectClass = DialectInfo.getClazzByName(dialectName);
-
-            dialect = (Dialect) dialectClass.newInstance();
+            dialect = GenericDialect.getDialectInstance(properties);
 
             parametersField = BoundSql.class.getDeclaredField("additionalParameters");
             parametersField.setAccessible(true);
