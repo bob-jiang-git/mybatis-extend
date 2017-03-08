@@ -38,11 +38,11 @@ public class PageInterceptor implements Interceptor {
     private Cache<CacheKey, MappedStatement> msCache;
 
     public Object intercept(Invocation invocation) throws Throwable {
+        initDialect();
         Object[] args = invocation.getArgs();
 
         MappedStatement ms          = (MappedStatement) args[0];
         Object parameter            = args[1];
-        RowBounds rowBounds         = (RowBounds) args[2];
         ResultHandler resultHandler = (ResultHandler) args[3];
         Executor executor           = (Executor) invocation.getTarget();
         BoundSql boundSql           = ms.getBoundSql(parameter);
@@ -109,6 +109,12 @@ public class PageInterceptor implements Interceptor {
             msCache = new SimpleCache<CacheKey, MappedStatement>(properties, "ms");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initDialect() {
+        if (dialect == null) {
+            setProperties(new Properties());
         }
     }
 

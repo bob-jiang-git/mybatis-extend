@@ -40,9 +40,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         bean.setDataSource(dataSource());
         bean.setTypeAliasesPackage("org.mybatis.extend.demo.model");
 
-        Properties properties = new Properties();
         PageInterceptor pageInterceptor = new PageInterceptor();
-        pageInterceptor.setProperties(properties);
         bean.setPlugins(new Interceptor[] {pageInterceptor});
 
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
