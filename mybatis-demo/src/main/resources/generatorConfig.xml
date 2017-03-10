@@ -3,6 +3,11 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
+    <!--
+        conf example.
+        可以添加table节点，其他节点不要改动。
+    -->
+
     <properties resource="generatorConfig.properties" />
 
     <context id="mysqlMap" targetRuntime="MyBatis3">
@@ -73,7 +78,6 @@
             tableName: 表名称。
             alias: 别名，在sql中会应用到，方便联合查询。
             domainObjectName: Model类名称，默认为表的驼峰名称，若需指定子包，可以"模块名称.类名"规则命名。
-            *ByExample: 指定是否生成相关Example的方法。
         -->
         <table tableName="admin_account" alias="account" domainObjectName="account.AdminAccount">
             <!--sqlStatement指定为JDBC即可-->
