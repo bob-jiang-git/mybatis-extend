@@ -20,16 +20,15 @@ public enum DialectInfo {
     }
 
     public static Class getClazzByName(String name) {
-        Class clazz = MYSQL.clazz;
         if (name == null || "".equals(name.trim())) {
-            return clazz;
+            return MYSQL.clazz;
         }
         for (DialectInfo info : DialectInfo.values()) {
             if (info.getName() == name.toLowerCase()) {
                 return info.getClazz();
             }
         }
-        return clazz;
+        throw new RuntimeException("不支持[" + name + "]方言的分页");
     }
 
     public String getName() {

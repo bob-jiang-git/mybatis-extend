@@ -3,7 +3,11 @@ package org.mybatis.extend.page.dialect.impl;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
 import org.mybatis.extend.page.dialect.GenericDialect;
+import org.mybatis.extend.page.util.ParseCountSql;
 import org.mybatis.extend.page.util.StringTools;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -19,6 +23,7 @@ public class MySqlGenericDialect extends GenericDialect {
 
     @Override
     public String getCountSql(String sql) {
-        return StringTools.append("select count(0) from (", sql, ") tmp_count");
+        return ParseCountSql.parseSql(sql);
     }
+
 }
