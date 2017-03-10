@@ -13,16 +13,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <mybatis-generator-version>1.3.2</mybatis-generator-version>
     </properties>
 
     <build>
         <finalName>mybatis-generator-extend</finalName>
+        <!-- example: 请在目标工程配置此插件。
         <plugins>
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>${mybatis-generator-version}</version>
+                <version>1.3.2</version>
                 <configuration>
                     <verbose>true</verbose>
                     <overwrite>true</overwrite>
@@ -36,6 +36,7 @@
                 </dependencies>
             </plugin>
         </plugins>
+        -->
     </build>
 
     <dependencies>
@@ -48,7 +49,7 @@
         <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
-            <version>${mybatis-generator-version}</version>
+            <version>1.3.2</version>
         </dependency>
 
     </dependencies>
