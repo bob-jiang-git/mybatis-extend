@@ -9,6 +9,17 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <name>mybatis-extend</name>
+    <url>https://github.com/BobJiangGit/mybatis-extend</url>
+    <description>mybatis-extend, 对mybatis做了一个拓展，主要包括MBG的拓展和分页插件</description>
+
+    <developers>
+        <developer>
+            <name>Bob Jiang</name>
+            <email>jw244849875@gmail.com</email>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

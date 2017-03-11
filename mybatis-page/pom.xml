@@ -4,15 +4,27 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mybatis-page</artifactId>
     <groupId>org.mybatis.extend</groupId>
+    <artifactId>mybatis-page</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <name>mybatis-page</name>
+    <url>https://github.com/BobJiangGit/mybatis-extend</url>
+    <description>mybatis-extend 分页插件</description>
+
+    <developers>
+        <developer>
+            <name>Bob Jiang</name>
+            <email>jw244849875@gmail.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <github.global.server>github</github.global.server>
     </properties>
 
     <dependencies>
@@ -22,5 +34,45 @@
             <version>3.4.0</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <altDeploymentRepository>
+                        internal.repo::default::file://${project.build.directory}/mvn-repository
+                    </altDeploymentRepository>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.12</version>
+                <configuration>
+                    <message>${project.artifactId} ${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <merge>true</merge>
+                    <outputDirectory>${project.build.directory}/mvn-repository</outputDirectory>
+                    <!--snapshot版本提交到master分支，release提交到release分支-->
+                    <branch>refs/heads/master</branch>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <repositoryName>mvn-repository</repositoryName>
+                    <repositoryOwner>BobJiangGit</repositoryOwner>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
