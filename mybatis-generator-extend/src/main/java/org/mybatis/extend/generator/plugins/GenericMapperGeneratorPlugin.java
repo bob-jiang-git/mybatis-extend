@@ -193,4 +193,34 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
             XmlElement element, IntrospectedTable introspectedTable) {
         return false;
     }
+
+    public boolean modelRecordWithBLOBsClassGenerated(
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapResultMapWithoutBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapSelectByExampleWithBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapUpdateByExampleWithBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapUpdateByPrimaryKeyWithBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean sqlMapUpdateByPrimaryKeyWithoutBLOBsElementGenerated(
+            XmlElement element, IntrospectedTable introspectedTable) {
+        return false;
+    }
 }
