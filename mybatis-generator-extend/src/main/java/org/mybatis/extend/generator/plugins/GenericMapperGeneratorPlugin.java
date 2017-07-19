@@ -199,7 +199,7 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
         return false;
     }
 
-    public boolean sqlMapResultMapWithoutBLOBsElementGenerated(
+    public boolean sqlMapResultMapWithBLOBsElementGenerated(
             XmlElement element, IntrospectedTable introspectedTable) {
         return false;
     }
