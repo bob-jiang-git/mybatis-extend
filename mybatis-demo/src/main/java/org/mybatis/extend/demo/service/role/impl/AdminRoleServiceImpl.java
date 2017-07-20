@@ -3,7 +3,6 @@ package org.mybatis.extend.demo.service.role.impl;
 import org.mybatis.extend.demo.mapper.role.AdminRoleMapper;
 import org.mybatis.extend.demo.model.role.AdminRole;
 import org.mybatis.extend.demo.service.role.AdminRoleService;
-import org.mybatis.extend.generic.mapper.GenericMapper;
 import org.mybatis.extend.generic.service.impl.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 */
 @Service
 @Transactional
-public class AdminRoleServiceImpl extends GenericServiceImpl<AdminRole, Integer> implements AdminRoleService {
+public class AdminRoleServiceImpl extends GenericServiceImpl<AdminRole, Integer, AdminRoleMapper> implements AdminRoleService {
     @Autowired
     private AdminRoleMapper adminRoleMapper;
 
     @Override
-    public GenericMapper<AdminRole, Integer> getGenericMapper() {
+    public AdminRoleMapper getGenericMapper() {
         return adminRoleMapper;
     }
 }

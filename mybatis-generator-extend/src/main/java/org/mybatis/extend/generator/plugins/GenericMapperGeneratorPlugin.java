@@ -25,12 +25,12 @@ import java.util.List;
  */
 public class GenericMapperGeneratorPlugin extends PluginAdapter {
 
-    protected String mapperTargetDir;
-    protected String mapperTargetPackage;
+    private String mapperTargetDir;
+    private String mapperTargetPackage;
 
-    protected ShellCallback shellCallback = null;
+    private ShellCallback shellCallback = null;
 
-    protected java.lang.reflect.Field isMergeable = null;
+    private java.lang.reflect.Field isMergeable = null;
 
     public GenericMapperGeneratorPlugin() throws NoSuchFieldException {
         this.shellCallback = new DefaultShellCallback(false);
@@ -145,8 +145,7 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
     }
 
     /**
-     * 修改mapper xml的namespace
-     *
+     * 修改mapper的namespace
      * @param document
      * @param introspectedTable
      * @return

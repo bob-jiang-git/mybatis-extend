@@ -3,7 +3,6 @@ package org.mybatis.extend.demo.service.account.impl;
 import org.mybatis.extend.demo.mapper.account.AdminAccountMapper;
 import org.mybatis.extend.demo.model.account.AdminAccount;
 import org.mybatis.extend.demo.service.account.AdminAccountService;
-import org.mybatis.extend.generic.mapper.GenericMapper;
 import org.mybatis.extend.generic.service.impl.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 */
 @Service
 @Transactional
-public class AdminAccountServiceImpl extends GenericServiceImpl<AdminAccount, Integer> implements AdminAccountService {
+public class AdminAccountServiceImpl extends GenericServiceImpl<AdminAccount, Integer, AdminAccountMapper> implements AdminAccountService {
     @Autowired
     private AdminAccountMapper adminAccountMapper;
 
     @Override
-    public GenericMapper<AdminAccount, Integer> getGenericMapper() {
+    public AdminAccountMapper getGenericMapper() {
         return adminAccountMapper;
     }
 }
