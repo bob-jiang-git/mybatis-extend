@@ -45,10 +45,12 @@ public abstract class GenericDialect implements Dialect {
     public Page getPageParameter(Object parameter) {
         if (parameter instanceof Map) {
             Map map = (Map) parameter;
-            Object pageObj = map.get(PageConstant.PAGE_KEY);
+            if (map.containsKey(PageConstant.PAGE_KEY)) {
+                Object pageObj = map.get(PageConstant.PAGE_KEY);
 
-            if (pageObj != null && (pageObj instanceof Page)) {
-                return (Page) pageObj;
+                if (pageObj != null && (pageObj instanceof Page)) {
+                    return (Page) pageObj;
+                }
             }
         }
         return null;
