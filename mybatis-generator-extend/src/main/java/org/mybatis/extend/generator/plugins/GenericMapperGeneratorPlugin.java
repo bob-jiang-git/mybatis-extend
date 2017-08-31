@@ -198,11 +198,6 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
         return false;
     }
 
-    public boolean sqlMapResultMapWithBLOBsElementGenerated(
-            XmlElement element, IntrospectedTable introspectedTable) {
-        return false;
-    }
-
     public boolean sqlMapSelectByExampleWithBLOBsElementGenerated(
             XmlElement element, IntrospectedTable introspectedTable) {
         return false;
@@ -218,8 +213,13 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
         return false;
     }
 
-    public boolean sqlMapUpdateByPrimaryKeyWithoutBLOBsElementGenerated(
-            XmlElement element, IntrospectedTable introspectedTable) {
-        return false;
-    }
+//    public boolean sqlMapResultMapWithBLOBsElementGenerated(
+//            XmlElement element, IntrospectedTable introspectedTable) {
+//        return false;
+//    }
+
+//    public boolean sqlMapUpdateByPrimaryKeyWithoutBLOBsElementGenerated(
+//            XmlElement element, IntrospectedTable introspectedTable) {
+//        return false;
+//    }
 }
