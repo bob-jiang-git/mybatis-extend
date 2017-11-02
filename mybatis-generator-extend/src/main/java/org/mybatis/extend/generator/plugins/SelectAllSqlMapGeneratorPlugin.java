@@ -22,13 +22,24 @@ public class SelectAllSqlMapGeneratorPlugin extends PluginAdapter {
         String tableName = introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime();
         XmlElement parentElement = document.getRootElement();
 
-        // 生成查询语句Element
         XmlElement selectAllElement = new XmlElement("select");
         selectAllElement.addAttribute(new Attribute("id", "selectAll"));
-        selectAllElement.addAttribute(new Attribute("resultMap", "BaseResultMap"));
 
-        String sql = "select <include refid=\"Base_Column_List\" /> from " + tableName;
-        selectAllElement.addElement(new TextElement(sql));
+        String mapId = introspectedTable.getResultMapWithBLOBsId();
+        if (mapId == null || "".equals(mapId)) {
+            mapId = introspectedTable.getBaseResultMapId();
+        }
+        selectAllElement.addAttribute(new Attribute("resultMap", mapId));
+
+        StringBuilder sql = new StringBuilder("select ");
+        sql.append("<include refid=\"").append(introspectedTable.getBaseColumnListId()).append("\" />");
+
+        String columnId = introspectedTable.getBlobColumnListId();
+        if (columnId != null && !"".equals(columnId)) {
+            sql.append(", <include refid=\"").append(columnId).append("\" />");
+        }
+        sql.append(" from ").append(tableName);
+        selectAllElement.addElement(new TextElement(sql.toString()));
         parentElement.addElement(selectAllElement);
         return super.sqlMapDocumentGenerated(document, introspectedTable);
     }
