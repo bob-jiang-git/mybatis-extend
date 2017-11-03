@@ -34,7 +34,7 @@ public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> 
      * @param model
      * @return
      */
-    List<T> select(T model);
+    List<T> select(@Param("model") T model);
 
     /**
      * 按model属性做等值匹配, 结果大于一条时会报错
@@ -42,7 +42,7 @@ public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> 
      * @param model
      * @return
      */
-    T selectOne(T model);
+    T selectOne(@Param("model") T model);
 
     /**
      * 分页
@@ -59,6 +59,6 @@ public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> 
      * @param model
      * @return
      */
-    Integer selectCount(T model);
+    Integer selectCount(@Param("model") T model);
 
 }

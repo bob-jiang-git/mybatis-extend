@@ -32,18 +32,14 @@ public class SelectMethodGenerator {
         XmlElement element = new XmlElement("select");
         element.addAttribute(new Attribute("id", selectId));
 
-        String mapId = introspectedTable.getResultMapWithBLOBsId();
-        if (mapId == null || "".equals(mapId)) {
-            mapId = introspectedTable.getBaseResultMapId();
-        }
-        element.addAttribute(new Attribute("resultMap", mapId));
+        boolean hasBLOBColumns = introspectedTable.getBLOBColumns().size() > 0;
 
+        element.addAttribute(new Attribute("resultMap", hasBLOBColumns ? introspectedTable.getResultMapWithBLOBsId() : introspectedTable.getBaseResultMapId()));
         element.addElement(new GenericTextElement("select"));
 
-        String columnId = introspectedTable.getBlobColumnListId();
         String colum = "<include refid=\"" + introspectedTable.getBaseColumnListId() + "\" />";
-        if (columnId != null && !"".equals(columnId)) {
-            colum += ", <include refid=\"" + columnId+ "\" />";
+        if (hasBLOBColumns) {
+            colum += ", <include refid=\"" + introspectedTable.getBlobColumnListId()+ "\" />";
         }
         element.addElement(new GenericTextElement(colum));
         element.addElement(new GenericTextElement("from " + tableName));
