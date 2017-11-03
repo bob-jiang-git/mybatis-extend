@@ -1,6 +1,9 @@
 package org.mybatis.extend.generic.mapper.base;
 
+import org.apache.ibatis.annotations.Param;
 import org.mybatis.extend.generic.model.BaseModel;
+import org.mybatis.extend.page.constant.PageConstant;
+import org.mybatis.extend.page.param.Page;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,7 +14,8 @@ import java.util.List;
 public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> {
 
     /**
-     * 按ID查询
+     * 按主键查询
+     *
      * @param id
      * @return
      */
@@ -23,5 +27,38 @@ public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> 
      * @return
      */
     List<T> selectAll();
+
+    /**
+     * 按model属性做等值匹配
+     *
+     * @param model
+     * @return
+     */
+    List<T> select(T model);
+
+    /**
+     * 按model属性做等值匹配, 结果大于一条时会报错
+     *
+     * @param model
+     * @return
+     */
+    T selectOne(T model);
+
+    /**
+     * 分页
+     *
+     * @param model
+     * @param page
+     * @return
+     */
+    List<T> selectPageList(@Param("model") T model, @Param(PageConstant.PAGE_KEY) Page page);
+
+    /**
+     * 数量
+     *
+     * @param model
+     * @return
+     */
+    Integer selectCount(T model);
 
 }

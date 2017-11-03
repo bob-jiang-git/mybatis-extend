@@ -27,6 +27,14 @@
         <github.global.server>github</github.global.server>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.mybatis.extend</groupId>
+            <artifactId>mybatis-page</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
