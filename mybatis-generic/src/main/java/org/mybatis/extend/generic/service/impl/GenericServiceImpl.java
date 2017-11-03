@@ -3,6 +3,7 @@ package org.mybatis.extend.generic.service.impl;
 import org.mybatis.extend.generic.mapper.GenericMapper;
 import org.mybatis.extend.generic.model.BaseModel;
 import org.mybatis.extend.generic.service.GenericService;
+import org.mybatis.extend.page.param.Page;
 
 import java.io.Serializable;
 import java.util.List;
@@ -43,5 +44,21 @@ public abstract class GenericServiceImpl<T extends BaseModel<PK>, PK extends Ser
 
     public int updateByPrimaryKeySelective(T model) {
         return getGenericMapper().updateByPrimaryKeySelective(model);
+    }
+
+    public List<T> select(T model) {
+        return getGenericMapper().select(model);
+    }
+
+    public T selectOne(T model) {
+        return getGenericMapper().selectOne(model);
+    }
+
+    public List<T> selectPageList(T model, Page page) {
+        return getGenericMapper().selectPageList(model, page);
+    }
+
+    public Integer selectCount(T model) {
+        return getGenericMapper().selectCount(model);
     }
 }

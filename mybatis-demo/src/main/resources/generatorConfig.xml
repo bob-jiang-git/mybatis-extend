@@ -44,8 +44,8 @@
             <property name="statement" value="true"/>
         </plugin>
 
-        <!--selectAll方法生成器-->
-        <plugin type="org.mybatis.extend.generator.plugins.SelectAllSqlMapGeneratorPlugin"/>
+        <!--select方法生成器-->
+        <plugin type="org.mybatis.extend.generator.plugins.SelectMethodSqlMapGeneratorPlugin"/>
 
         <!--自定义的注释生成器-->
         <commentGenerator type="org.mybatis.extend.generator.internal.CustomCommentGenerator"/>
