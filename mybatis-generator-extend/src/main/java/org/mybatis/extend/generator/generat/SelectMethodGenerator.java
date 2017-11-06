@@ -59,6 +59,9 @@ public class SelectMethodGenerator {
         GenericXmlElement whereElement = new GenericXmlElement("where");
         whereCase.addElement(whereElement);
 
+        GenericXmlElement modelIf = new GenericXmlElement("if");
+        modelIf.addAttribute(new Attribute("test", "model != null"));
+        whereElement.addElement(modelIf);
         String alias = introspectedTable.getTableConfiguration().getAlias();
         List<IntrospectedColumn> columns = introspectedTable.getAllColumns();
         for (IntrospectedColumn column : columns) {
@@ -69,7 +72,7 @@ public class SelectMethodGenerator {
             String cases = "and " + alias + "." + column.getActualColumnName() + " = #{model." + column.getJavaProperty() + "}";
             GenericTextElement caseElement = new GenericTextElement(cases);
             ifElement.addElement(caseElement);
-            whereElement.addElement(ifElement);
+            modelIf.addElement(ifElement);
         }
         parentElement.addElement(whereCase);
         parentElement.addElement(new TextElement(""));
