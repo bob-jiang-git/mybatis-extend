@@ -144,7 +144,7 @@ public class SqlMapExtendMethodGenerator {
         }
 
         element.addElement(new GenericTextElement(") values"));
-        element.addElement(new GenericTextElement("<foreach collection =\"list\" item=\"item\" index= \"index\" separator =\",\">"));
+        element.addElement(new GenericTextElement("<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\",\">"));
         element.addElement(new GenericTextElement("("));
 
         for (int i = 0; i < columns.size(); i += len) {
