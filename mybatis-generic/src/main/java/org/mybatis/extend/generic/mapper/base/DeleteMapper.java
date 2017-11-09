@@ -1,6 +1,7 @@
 package org.mybatis.extend.generic.mapper.base;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Bob Jiang on 2017/11/2.
@@ -14,4 +15,10 @@ public interface DeleteMapper<PK extends Serializable> {
      */
     int deleteByPrimaryKey(PK id);
 
+    /**
+     * 批量删除数据
+     * @param list
+     * @return
+     */
+    int deleteByIds(List<PK> list);
 }

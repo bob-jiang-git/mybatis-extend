@@ -4,7 +4,6 @@ import org.mybatis.extend.generic.mapper.GenericMapper;
 import org.mybatis.extend.generic.model.BaseModel;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * GenericService

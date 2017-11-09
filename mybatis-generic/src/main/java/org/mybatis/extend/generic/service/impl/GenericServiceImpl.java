@@ -61,4 +61,12 @@ public abstract class GenericServiceImpl<T extends BaseModel<PK>, PK extends Ser
     public Integer selectCount(T model) {
         return getGenericMapper().selectCount(model);
     }
+
+    public int batchInsert(List<T> list) {
+        return getGenericMapper().batchInsert(list);
+    }
+
+    public int deleteByIds(List<PK> list) {
+        return getGenericMapper().deleteByIds(list);
+    }
 }

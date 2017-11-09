@@ -9,19 +9,20 @@ import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Bob Jiang on 2017/11/3.
  */
-public class SelectMethodGenerator {
+public class SqlMapExtendMethodGenerator {
 
     public static final String WHERE_CLAUSE_ID = "model_where_clause";
 
     private XmlElement parentElement;
     private IntrospectedTable introspectedTable;
 
-    public SelectMethodGenerator(XmlElement parentElement, IntrospectedTable introspectedTable) {
+    public SqlMapExtendMethodGenerator(XmlElement parentElement, IntrospectedTable introspectedTable) {
         this.parentElement = parentElement;
         this.introspectedTable = introspectedTable;
     }
@@ -49,6 +50,7 @@ public class SelectMethodGenerator {
     private void buildWhereCase(XmlElement element) {
         element.addElement(new GenericTextElement("<include refid=\"" + WHERE_CLAUSE_ID + "\"/>"));
         parentElement.addElement(element);
+        parentElement.addElement(new TextElement(""));
     }
 
     public void addModelWhereCase() {
@@ -89,7 +91,6 @@ public class SelectMethodGenerator {
         FullyQualifiedJavaType parameterType = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
         element.addAttribute(new Attribute("parameterType", parameterType.getFullyQualifiedName()));
         buildWhereCase(element);
-        parentElement.addElement(new TextElement(""));
     }
 
     public void addSelectOne() {
@@ -98,7 +99,6 @@ public class SelectMethodGenerator {
         element.addAttribute(new Attribute("parameterType", parameterType.getFullyQualifiedName()));
         buildWhereCase(element);
         element.addElement(new GenericTextElement("limit 1"));
-        parentElement.addElement(new TextElement(""));
     }
 
     public void addSelectPageList() {
@@ -106,7 +106,6 @@ public class SelectMethodGenerator {
         FullyQualifiedJavaType parameterType = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
         element.addAttribute(new Attribute("parameterType", parameterType.getFullyQualifiedName()));
         buildWhereCase(element);
-        parentElement.addElement(new TextElement(""));
     }
 
     public void addSelectCount() {
@@ -119,6 +118,64 @@ public class SelectMethodGenerator {
 
         element.addElement(new GenericTextElement("select count(1) from " + tableName));
         buildWhereCase(element);
+    }
+
+    public void addBatchInsert() {
+        XmlElement element = new XmlElement("insert");
+        element.addAttribute(new Attribute("id", "batchInsert"));
+        element.addAttribute(new Attribute("parameterType", "java.util.List"));
+        element.addAttribute(new Attribute("useGeneratedKeys", "true"));
+        element.addAttribute(new Attribute("keyProperty", "id"));
+
+        String tableName = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
+        element.addElement(new GenericTextElement("insert into " + tableName + " ("));
+        List<IntrospectedColumn> columns = introspectedTable.getNonPrimaryKeyColumns();
+        int len = 3;
+
+        for (int i = 0; i < columns.size(); i += len) {
+            String values = "";
+            for (int j = i; j < i + len; j++) {
+                if (j < columns.size()) {
+                    IntrospectedColumn column = columns.get(j);
+                    values += column.getActualColumnName() + (j < columns.size() - 1 ? ", " : "");
+                }
+            }
+            element.addElement(new GenericTextElement("    " + values));
+        }
+
+        element.addElement(new GenericTextElement(") values"));
+        element.addElement(new GenericTextElement("<foreach collection =\"list\" item=\"item\" index= \"index\" separator =\",\">"));
+        element.addElement(new GenericTextElement("("));
+
+        for (int i = 0; i < columns.size(); i += len) {
+            String values = "";
+            for (int j = i; j < i + len; j++) {
+                if (j < columns.size()) {
+                    IntrospectedColumn column = columns.get(j);
+                    values += "#{item." + column.getJavaProperty() + "}" + (j < columns.size() - 1 ? ", " : "");
+                }
+            }
+            element.addElement(new GenericTextElement("    " + values));
+        }
+        element.addElement(new GenericTextElement(")"));
+        element.addElement(new GenericTextElement("</foreach>"));
+        parentElement.addElement(element);
+        parentElement.addElement(new TextElement(""));
+    }
+
+    public void addDeleteByIds() {
+        XmlElement element = new XmlElement("delete");
+        element.addAttribute(new Attribute("id", "deleteByIds"));
+        element.addAttribute(new Attribute("parameterType", "java.util.List"));
+
+        String tableName = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
+
+        element.addElement(new GenericTextElement("delete from " + tableName));
+        element.addElement(new GenericTextElement("where id in"));
+        element.addElement(new GenericTextElement("<foreach collection=\"list\" index=\"index\" item=\"item\" open=\"(\" close=\")\" separator=\",\">"));
+        element.addElement(new GenericTextElement("    #{item}"));
+        element.addElement(new GenericTextElement("</foreach>"));
+        parentElement.addElement(element);
         parentElement.addElement(new TextElement(""));
     }
 }
