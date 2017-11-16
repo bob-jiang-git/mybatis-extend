@@ -20,8 +20,8 @@ public class SqlMapExtendMethodGeneratorPlugin extends PluginAdapter {
     public boolean sqlMapDocumentGenerated(Document document, IntrospectedTable introspectedTable) {
         XmlElement parentElement = document.getRootElement();
         SqlMapExtendMethodGenerator generator = new SqlMapExtendMethodGenerator(parentElement, introspectedTable);
+
         generator.addModelWhereCase();
-        generator.addSelectAll();
         generator.addSelect();
         generator.addSelectOne();
         generator.addSelectPageList();
