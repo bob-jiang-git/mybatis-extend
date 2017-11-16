@@ -34,10 +34,6 @@ public abstract class GenericServiceImpl<T extends BaseModel<PK>, PK extends Ser
         return getGenericMapper().selectByPrimaryKey(id);
     }
 
-    public List<T> selectAll() {
-        return getGenericMapper().selectAll();
-    }
-
     public int updateByPrimaryKey(T model) {
         return getGenericMapper().updateByPrimaryKey(model);
     }

@@ -22,13 +22,6 @@ public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> 
     T selectByPrimaryKey(PK id);
 
     /**
-     * 查询所有数据
-     *
-     * @return
-     */
-    List<T> selectAll();
-
-    /**
      * 按model属性做等值匹配
      *
      * @param model

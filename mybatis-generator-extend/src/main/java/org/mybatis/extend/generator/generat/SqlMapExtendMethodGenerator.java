@@ -91,6 +91,10 @@ public class SqlMapExtendMethodGenerator {
         FullyQualifiedJavaType parameterType = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
         element.addAttribute(new Attribute("parameterType", parameterType.getFullyQualifiedName()));
         buildWhereCase(element);
+        GenericXmlElement modelIf = new GenericXmlElement("if");
+        modelIf.addAttribute(new Attribute("test", "model == null"));
+        modelIf.addElement(new GenericTextElement("where 0 = 1"));
+        element.addElement(modelIf);
     }
 
     public void addSelectOne() {

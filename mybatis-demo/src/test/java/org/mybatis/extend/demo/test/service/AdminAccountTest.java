@@ -31,7 +31,7 @@ public class AdminAccountTest extends BaseTest {
 
     @Test
     public void select() {
-        List<AdminAccount> list = adminAccountService.selectAll();
+        List<AdminAccount> list = adminAccountService.select(null);
         for (AdminAccount account : list) {
             System.out.println(account);
         }
