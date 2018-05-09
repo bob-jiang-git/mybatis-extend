@@ -69,6 +69,8 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
                 Interface mapperInterface = new Interface(this.mapperTargetPackage + packageName + "." + mapperName);
                 mapperInterface.setVisibility(JavaVisibility.PUBLIC);
                 mapperInterface.addImportedType(modelJavaType);
+                FullyQualifiedJavaType mapper = new FullyQualifiedJavaType(GeneratorConstant.MAPPER_CLASS_PATH);
+                mapperInterface.addImportedType(mapper);
 
                 mapperInterface.addJavaDocLine("/**");
                 mapperInterface.addJavaDocLine(" * Mapper: " + mapperName);
@@ -83,6 +85,8 @@ public class GenericMapperGeneratorPlugin extends PluginAdapter {
                 superInterfaceType.addTypeArgument(modelJavaType);
                 superInterfaceType.addTypeArgument(pkType);
                 mapperInterface.addSuperInterface(superInterfaceType);
+
+                mapperInterface.addAnnotation("@Mapper");
 
                 try {
                     GeneratedJavaFile file = new GeneratedJavaFile(mapperInterface, this.mapperTargetDir, javaFormatter);

@@ -11,4 +11,12 @@ public interface PageConstant {
 
     String DIALECT = "dialect";
 
+    String PAGE_SIZE_KEY = "page_size";
+
+    String PAGE_NUM_KEY = "page_num";
+
+    String TOTAL_PAGE_KEY = "total_page";
+
+    String TOTAL_ROWS_KEY = "total_rows";
+
 }

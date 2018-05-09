@@ -19,6 +19,6 @@ public interface GeneratorConstant {
 
     String TRANSACTIONAL_CLASS_PATH = "org.springframework.transaction.annotation.Transactional";
 
-
+    String MAPPER_CLASS_PATH = "org.apache.ibatis.annotations.Mapper";
 
 }

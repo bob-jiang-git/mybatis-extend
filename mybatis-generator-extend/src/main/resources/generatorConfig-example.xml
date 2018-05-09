@@ -75,6 +75,8 @@
             domainObjectName: Model类名称，默认为表的驼峰名称，若需指定子包，可以"模块名称.类名"规则命名。
         -->
         <table tableName="table_name" alias="tab" domainObjectName="module.TableName">
+            <!-- 为true则不使用驼峰命名法 -->
+            <property name="useActualColumnNames" value="true"/>
             <!--sqlStatement指定为JDBC即可-->
             <generatedKey column="id" sqlStatement="JDBC"/>
         </table>

@@ -45,7 +45,7 @@
         </plugin>
 
         <!--select方法生成器-->
-        <plugin type="org.mybatis.extend.generator.plugins.SelectMethodSqlMapGeneratorPlugin"/>
+        <plugin type="org.mybatis.extend.generator.plugins.SqlMapExtendMethodGeneratorPlugin"/>
 
         <!--自定义的注释生成器-->
         <commentGenerator type="org.mybatis.extend.generator.internal.CustomCommentGenerator"/>
@@ -70,16 +70,13 @@
         </sqlMapGenerator>
 
         <!--
-        <javaClientGenerator type="ANNOTATEDMAPPER"
-            targetPackage="${mapperTargetPackage}" targetProject="${mapperTargetDir}"/>
-        -->
-
-        <!--
             tableName: 表名称。
             alias: 别名，在sql中会应用到，方便联合查询。
             domainObjectName: Model类名称，默认为表的驼峰名称，若需指定子包，可以"模块名称.类名"规则命名。
         -->
         <table tableName="admin_account" alias="account" domainObjectName="account.AdminAccount">
+            <!-- 为true则不使用驼峰命名法 -->
+            <property name="useActualColumnNames" value="true"/>
             <!--sqlStatement指定为JDBC即可-->
             <generatedKey column="id" sqlStatement="JDBC"/>
         </table>
