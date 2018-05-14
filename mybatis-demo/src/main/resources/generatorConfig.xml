@@ -13,9 +13,8 @@
     <context id="mysqlMap" targetRuntime="MyBatis3">
         <property name="javaFileEncoding" value="UTF-8"/>
 
-        <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
-        <!--重写Model的equals和hashCode方法-->
+        <!--重写Model的toString, equals和hashCode方法-->
         <plugin type="org.mybatis.extend.generator.plugins.EqualsHashCodePlugin" />
 
         <!--修改Model的父类，注释，主键属性-->
@@ -74,14 +73,22 @@
             alias: 别名，在sql中会应用到，方便联合查询。
             domainObjectName: Model类名称，默认为表的驼峰名称，若需指定子包，可以"模块名称.类名"规则命名。
         -->
-        <table tableName="admin_account" alias="account" domainObjectName="account.AdminAccount">
+        <table tableName="test_none_pk" alias="tnp" domainObjectName="test.TestNonePk">
             <!-- 为true则不使用驼峰命名法 -->
             <property name="useActualColumnNames" value="true"/>
-            <!--sqlStatement指定为JDBC即可-->
-            <generatedKey column="id" sqlStatement="JDBC"/>
         </table>
 
-        <table tableName="admin_role" alias="role" domainObjectName="role.AdminRole">
+        <table tableName="test_pk" alias="tp" domainObjectName="test.TestPk">
+            <!-- 为true则不使用驼峰命名法 -->
+            <property name="useActualColumnNames" value="true"/>
+
+            <generatedKey column="channel, name" sqlStatement="JDBC"/>
+        </table>
+
+        <table tableName="test_one_pk" alias="tp" domainObjectName="test.TestOnePk">
+            <!-- 为true则不使用驼峰命名法 -->
+            <property name="useActualColumnNames" value="true"/>
+
             <generatedKey column="id" sqlStatement="JDBC"/>
         </table>
         

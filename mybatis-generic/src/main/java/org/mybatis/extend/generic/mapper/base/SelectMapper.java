@@ -5,21 +5,12 @@ import org.mybatis.extend.generic.model.BaseModel;
 import org.mybatis.extend.page.constant.PageConstant;
 import org.mybatis.extend.page.param.Page;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Bob Jiang on 2017/11/2.
  */
-public interface SelectMapper<T extends BaseModel<PK>, PK extends Serializable> {
-
-    /**
-     * 按主键查询
-     *
-     * @param id
-     * @return
-     */
-    T selectByPrimaryKey(PK id);
+public interface SelectMapper<T extends BaseModel> {
 
     /**
      * 按model属性做等值匹配

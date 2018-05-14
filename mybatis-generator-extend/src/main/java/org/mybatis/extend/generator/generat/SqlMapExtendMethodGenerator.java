@@ -9,7 +9,6 @@ import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -128,8 +127,11 @@ public class SqlMapExtendMethodGenerator {
         XmlElement element = new XmlElement("insert");
         element.addAttribute(new Attribute("id", "batchInsert"));
         element.addAttribute(new Attribute("parameterType", "java.util.List"));
-        element.addAttribute(new Attribute("useGeneratedKeys", "true"));
-        element.addAttribute(new Attribute("keyProperty", "id"));
+        List<IntrospectedColumn> pkColumns = introspectedTable.getPrimaryKeyColumns();
+        if (pkColumns.size() == 1) {
+            element.addAttribute(new Attribute("useGeneratedKeys", "true"));
+            element.addAttribute(new Attribute("keyProperty", pkColumns.get(0).getJavaProperty()));
+        }
 
         String tableName = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         element.addElement(new GenericTextElement("insert into " + tableName + " ("));
@@ -168,18 +170,27 @@ public class SqlMapExtendMethodGenerator {
     }
 
     public void addDeleteByIds() {
+
         XmlElement element = new XmlElement("delete");
         element.addAttribute(new Attribute("id", "deleteByIds"));
         element.addAttribute(new Attribute("parameterType", "java.util.List"));
 
         String tableName = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
+        int pkSize = introspectedTable.getPrimaryKeyColumns().size();
 
         element.addElement(new GenericTextElement("delete from " + tableName));
-        element.addElement(new GenericTextElement("where id in"));
-        element.addElement(new GenericTextElement("<foreach collection=\"list\" index=\"index\" item=\"item\" open=\"(\" close=\")\" separator=\",\">"));
-        element.addElement(new GenericTextElement("    #{item}"));
-        element.addElement(new GenericTextElement("</foreach>"));
-        parentElement.addElement(element);
-        parentElement.addElement(new TextElement(""));
+        if (pkSize > 1) {
+            element.addElement(new GenericTextElement("where 0 = 1"));
+        } else if (pkSize == 1) {
+            element.addElement(new GenericTextElement("where " + introspectedTable.getPrimaryKeyColumns().get(0).getJavaProperty() + " in"));
+            element.addElement(new GenericTextElement("<foreach collection=\"list\" index=\"index\" item=\"item\" open=\"(\" close=\")\" separator=\",\">"));
+            element.addElement(new GenericTextElement("    #{item}"));
+            element.addElement(new GenericTextElement("</foreach>"));
+        }
+
+        if (pkSize > 0) {
+            parentElement.addElement(element);
+            parentElement.addElement(new TextElement(""));
+        }
     }
 }

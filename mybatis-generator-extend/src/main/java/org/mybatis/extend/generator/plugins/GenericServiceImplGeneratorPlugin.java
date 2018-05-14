@@ -49,9 +49,6 @@ public class GenericServiceImplGeneratorPlugin extends PluginAdapter {
         JavaFormatter javaFormatter = this.context.getJavaFormatter();
 
         List<IntrospectedColumn> primaryKeyColumns = introspectedTable.getPrimaryKeyColumns();
-        FullyQualifiedJavaType pkType = !primaryKeyColumns.isEmpty() ?
-                primaryKeyColumns.get(0).getFullyQualifiedJavaType() :
-                new FullyQualifiedJavaType("java.lang.String");
 
         String packageName = introspectedTable.getFullyQualifiedTable().getSubPackage(true);
 
@@ -61,11 +58,11 @@ public class GenericServiceImplGeneratorPlugin extends PluginAdapter {
             CompilationUnit unit = javaFile.getCompilationUnit();
             FullyQualifiedJavaType modelJavaType = unit.getType();
             String shortName = modelJavaType.getShortName();
-            if(!shortName.endsWith("Example") && !shortName.endsWith("Mapper") && !shortName.endsWith("SqlProvider")) {
+            if(shortName.equals(introspectedTable.getFullyQualifiedTable().getDomainObjectName()) &&
+                    !shortName.endsWith("Example") && !shortName.endsWith("Mapper") && !shortName.endsWith("SqlProvider")) {
                 String serviceName = shortName + "ServiceImpl";
                 TopLevelClass serviceImplClass = new TopLevelClass(this.serviceTargetPackage + packageName + ".impl." + serviceName);
                 serviceImplClass.setVisibility(JavaVisibility.PUBLIC);
-                serviceImplClass.addImportedType(modelJavaType);
 
                 serviceImplClass.addJavaDocLine("/**");
                 serviceImplClass.addJavaDocLine(" * ServiceImpl: " + serviceName);
@@ -99,6 +96,30 @@ public class GenericServiceImplGeneratorPlugin extends PluginAdapter {
                 }
 
                 serviceImplClass.addField(mapperField);
+                serviceImplClass.addImportedType(modelJavaType);
+
+                if (primaryKeyColumns.size() > 0) {
+                    FullyQualifiedJavaType pkType = primaryKeyColumns.size() > 1
+                            ? unit.getSuperClass() : primaryKeyColumns.get(0).getFullyQualifiedJavaType();
+
+                    FullyQualifiedJavaType superImplType = new FullyQualifiedJavaType(GeneratorConstant.GENERIC_SERVICE_IMPL_CLASS_PATH);
+                    serviceImplClass.addImportedType(superImplType);
+                    superImplType.addTypeArgument(modelJavaType);
+                    superImplType.addTypeArgument(pkType);
+                    superImplType.addTypeArgument(mapperType);
+                    serviceImplClass.setSuperClass(superImplType);
+
+                } else {
+                    FullyQualifiedJavaType superImplType = new FullyQualifiedJavaType(GeneratorConstant.GENERIC_WITHOUT_PRIMARY_KEY_SERVICE_IMPL_CLASS_PATH);
+                    serviceImplClass.addImportedType(superImplType);
+                    superImplType.addTypeArgument(modelJavaType);
+                    superImplType.addTypeArgument(mapperType);
+                    serviceImplClass.setSuperClass(superImplType);
+                }
+
+                FullyQualifiedJavaType interfaceType = new FullyQualifiedJavaType(this.serviceTargetPackage + packageName + "." + shortName + "Service");
+                serviceImplClass.addImportedType(interfaceType);
+                serviceImplClass.addSuperInterface(interfaceType);
 
                 mapperMethod.addBodyLine("return " + mapperField.getName() + ";");
                 mapperMethod.setName("getGenericMapper");
@@ -106,17 +127,6 @@ public class GenericServiceImplGeneratorPlugin extends PluginAdapter {
                 mapperMethod.addAnnotation("@Override");
                 mapperMethod.setReturnType(mapperType);
                 serviceImplClass.addMethod(mapperMethod);
-
-                FullyQualifiedJavaType superImplType = new FullyQualifiedJavaType(GeneratorConstant.GENERIC_SERVICE_IMPL_CLASS_PATH);
-                serviceImplClass.addImportedType(superImplType);
-                superImplType.addTypeArgument(modelJavaType);
-                superImplType.addTypeArgument(pkType);
-                superImplType.addTypeArgument(mapperType);
-                serviceImplClass.setSuperClass(superImplType);
-
-                FullyQualifiedJavaType interfaceType = new FullyQualifiedJavaType(this.serviceTargetPackage + packageName + "." + shortName + "Service");
-                serviceImplClass.addImportedType(interfaceType);
-                serviceImplClass.addSuperInterface(interfaceType);
 
                 try {
                     GeneratedJavaFile file = new GeneratedJavaFile(serviceImplClass, this.serviceTargetDir, javaFormatter);

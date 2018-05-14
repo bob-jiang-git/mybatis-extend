@@ -29,20 +29,25 @@ public class EqualsHashCodePlugin extends PluginAdapter {
             columns = introspectedTable.getPrimaryKeyColumns();
         }
 
-        this.generateEquals(topLevelClass, columns, introspectedTable);
-        this.generateHashCode(topLevelClass, columns, introspectedTable);
+        if (!columns.isEmpty()) {
+            this.generateEquals(topLevelClass, columns, introspectedTable);
+            this.generateHashCode(topLevelClass, columns, introspectedTable);
+            this.generateToString(topLevelClass, introspectedTable.getAllColumns(), introspectedTable);
+        }
         return true;
     }
 
     public boolean modelPrimaryKeyClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
         this.generateEquals(topLevelClass, introspectedTable.getPrimaryKeyColumns(), introspectedTable);
         this.generateHashCode(topLevelClass, introspectedTable.getPrimaryKeyColumns(), introspectedTable);
+        this.generateToString(topLevelClass, introspectedTable.getPrimaryKeyColumns(), introspectedTable);
         return true;
     }
 
     public boolean modelRecordWithBLOBsClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
         this.generateEquals(topLevelClass, introspectedTable.getAllColumns(), introspectedTable);
         this.generateHashCode(topLevelClass, introspectedTable.getAllColumns(), introspectedTable);
+        this.generateToString(topLevelClass, introspectedTable.getAllColumns(), introspectedTable);
         return true;
     }
 
@@ -195,6 +200,36 @@ public class EqualsHashCodePlugin extends PluginAdapter {
         }
 
         method.addBodyLine("return result;");
+        topLevelClass.addMethod(method);
+    }
+
+    protected void generateToString(TopLevelClass topLevelClass, List<IntrospectedColumn> introspectedColumns, IntrospectedTable introspectedTable) {
+        Method method = new Method();
+        method.setVisibility(JavaVisibility.PUBLIC);
+        method.setReturnType(FullyQualifiedJavaType.getStringInstance());
+        method.setName("toString");
+        if (introspectedTable.isJava5Targeted()) {
+            method.addAnnotation("@Override");
+        }
+
+        this.context.getCommentGenerator().addGeneralMethodComment(method, introspectedTable);
+        method.addBodyLine("StringBuilder sb = new StringBuilder();");
+        method.addBodyLine("sb.append(getClass().getSimpleName());");
+        method.addBodyLine("sb.append(\" [\");");
+        StringBuilder sb = new StringBuilder();
+        Iterator<IntrospectedColumn> iterator = introspectedColumns.iterator();
+
+        while(iterator.hasNext()) {
+            IntrospectedColumn introspectedColumn = iterator.next();
+            FullyQualifiedJavaType fqjt = introspectedColumn.getFullyQualifiedJavaType();
+            String getterMethod = JavaBeansUtil.getGetterMethodName(introspectedColumn.getJavaProperty(), fqjt);
+            sb.setLength(0);
+            sb.append("sb.append(\"").append(introspectedColumn.getJavaProperty()).append("=\")").append(".append(").append(getterMethod + "()").append(");");
+            method.addBodyLine(sb.toString());
+        }
+
+        method.addBodyLine("sb.append(\"]\");");
+        method.addBodyLine("return sb.toString();");
         topLevelClass.addMethod(method);
     }
 }
