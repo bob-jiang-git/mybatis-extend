@@ -215,20 +215,19 @@ public class EqualsHashCodePlugin extends PluginAdapter {
         this.context.getCommentGenerator().addGeneralMethodComment(method, introspectedTable);
         method.addBodyLine("StringBuilder sb = new StringBuilder();");
         method.addBodyLine("sb.append(getClass().getSimpleName());");
-        method.addBodyLine("sb.append(\" [\");");
+        method.addBodyLine("sb.append(\" {\");");
         StringBuilder sb = new StringBuilder();
-        Iterator<IntrospectedColumn> iterator = introspectedColumns.iterator();
 
-        while(iterator.hasNext()) {
-            IntrospectedColumn introspectedColumn = iterator.next();
+        for (int i = 0; i < introspectedColumns.size(); i++) {
+            IntrospectedColumn introspectedColumn = introspectedColumns.get(i);
             FullyQualifiedJavaType fqjt = introspectedColumn.getFullyQualifiedJavaType();
             String getterMethod = JavaBeansUtil.getGetterMethodName(introspectedColumn.getJavaProperty(), fqjt);
             sb.setLength(0);
-            sb.append("sb.append(\"").append(introspectedColumn.getJavaProperty()).append("=\")").append(".append(").append(getterMethod + "()").append(");");
+            sb.append("sb.append(\"").append(i > 0 ? ", " : "").append(introspectedColumn.getJavaProperty()).append("=\")").append(".append(").append(getterMethod + "()").append(");");
             method.addBodyLine(sb.toString());
         }
 
-        method.addBodyLine("sb.append(\"]\");");
+        method.addBodyLine("sb.append(\"}\");");
         method.addBodyLine("return sb.toString();");
         topLevelClass.addMethod(method);
     }
