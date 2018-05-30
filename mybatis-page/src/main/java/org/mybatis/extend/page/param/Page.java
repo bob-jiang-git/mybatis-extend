@@ -4,6 +4,10 @@ import org.apache.ibatis.session.RowBounds;
 import org.mybatis.extend.page.constant.PageConstant;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Page 作为输入
@@ -16,6 +20,7 @@ public class Page implements Serializable {
 
     private int pageSize;
     private int pageNum;
+    private List<Map<String, OrderType>> orders = new ArrayList<Map<String, OrderType>>();
 
     public Page() { }
 
@@ -48,6 +53,34 @@ public class Page implements Serializable {
 
     public void setPageNum(int pageNum) {
         this.pageNum = pageNum;
+    }
+
+    public List<Map<String, OrderType>> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Map<String, OrderType>> orders) {
+        this.orders = orders;
+    }
+
+    public void setAscOrders(List<String> orders) {
+        settingOrder(orders, OrderType.ASC);
+    }
+
+    public void setDescOrders(List<String> orders) {
+        settingOrder(orders, OrderType.DESC);
+    }
+
+    private void settingOrder(List<String> orders, OrderType orderType) {
+        orders.forEach(i -> {
+            Map<String, OrderType> map = new HashMap<String, OrderType>();
+            map.put(i, orderType);
+            this.orders.add(map);
+        });
+    }
+
+    public enum OrderType {
+        ASC, DESC
     }
 
 }

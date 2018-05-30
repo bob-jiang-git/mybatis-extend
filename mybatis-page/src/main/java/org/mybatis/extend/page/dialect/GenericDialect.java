@@ -68,8 +68,8 @@ public abstract class GenericDialect implements Dialect {
     }
 
     public BoundSql getPageSql(MappedStatement ms, BoundSql boundSql, Object parameter,
-            CacheKey pageKey, RowBounds rowBounds , Map<String, Object> additionalParameters) {
-        String pageSql = getPageSql(boundSql.getSql(), rowBounds, pageKey);
+            CacheKey pageKey, RowBounds rowBounds , Map<String, Object> additionalParameters, List<Map<String, Page.OrderType>> orders) {
+        String pageSql = getPageSql(boundSql.getSql(), rowBounds, pageKey, orders);
 
         BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameter);
         for (String key : additionalParameters.keySet()) {
@@ -82,7 +82,7 @@ public abstract class GenericDialect implements Dialect {
         return new PageList(resultList, page.getPageNum(), page.getPageSize(), totalRows);
     }
 
-    public abstract String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey);
+    public abstract String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey, List<Map<String, Page.OrderType>> orders);
 
     public abstract String getCountSql(String sql);
 

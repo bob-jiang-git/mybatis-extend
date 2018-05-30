@@ -86,10 +86,11 @@ public class PageInterceptor implements Interceptor {
 
         Page page = dialect.getPageParameter(parameter);
         RowBounds pageRowBounds = page.toRowBounds();
+        List<Map<String, Page.OrderType>> orders = page.getOrders();
 
         CacheKey cacheKey = executor.createCacheKey(ms, parameter, pageRowBounds, boundSql);
 
-        BoundSql pageBoundSql = dialect.getPageSql(ms, boundSql, parameter, cacheKey, pageRowBounds, additionalParameters);
+        BoundSql pageBoundSql = dialect.getPageSql(ms, boundSql, parameter, cacheKey, pageRowBounds, additionalParameters, orders);
         List resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, pageBoundSql);
 
         return dialect.buildPageList(resultList, page, totalRows);

@@ -3,7 +3,11 @@ package org.mybatis.extend.page.dialect.impl;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
 import org.mybatis.extend.page.dialect.GenericDialect;
+import org.mybatis.extend.page.param.Page;
 import org.mybatis.extend.page.util.StringTools;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -12,7 +16,7 @@ import org.mybatis.extend.page.util.StringTools;
 public class OracleGenericDialect extends GenericDialect {
 
     @Override
-    public String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey, List<Map<String, Page.OrderType>> orders) {
         int startRow = rowBounds.getOffset();
         int endRow = rowBounds.getOffset() + rowBounds.getLimit();
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);

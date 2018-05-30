@@ -25,7 +25,7 @@ public interface Dialect {
                         Map<String, Object> additionalParameters);
 
     BoundSql getPageSql(MappedStatement ms, BoundSql boundSql, Object parameter,
-                        CacheKey pageKey, RowBounds rowBounds, Map<String, Object> additionalParameters);
+                        CacheKey pageKey, RowBounds rowBounds, Map<String, Object> additionalParameters, List<Map<String, Page.OrderType>> orders);
 
     PageList buildPageList(List resultList, Page page, int totalRows);
 }
