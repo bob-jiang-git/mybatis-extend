@@ -18,41 +18,41 @@ public class Page implements Serializable {
 
     private static final long serialVersionUID = -4882478724270973629L;
 
-    private int pageSize;
-    private int pageNum;
+    private int page_size;
+    private int page_num;
     private List<Map<String, OrderType>> orders = new ArrayList<Map<String, OrderType>>();
 
     public Page() { }
 
     public Page(int pageNum) {
-        this.pageNum = pageNum;
+        this.page_num = pageNum;
     }
 
     public Page(int pageSize, int pageNum) {
-        this.pageSize = pageSize;
-        this.pageNum = pageNum;
+        this.page_size = pageSize;
+        this.page_num = pageNum;
     }
 
     public RowBounds toRowBounds() {
-        int offset = (getPageNum() - 1) * getPageSize();
-        int limit = getPageSize();
+        int offset = (getPage_num() - 1) * getPage_size();
+        int limit = getPage_size();
         return new RowBounds(offset, limit);
     }
 
-    public int getPageSize() {
-        return pageSize > 0 ? pageSize : PageConstant.PAGE_SIZE;
+    public int getPage_size() {
+        return page_size > 0 ? page_size : PageConstant.PAGE_SIZE;
     }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
+    public void setPage_size(int pageSize) {
+        this.page_size = pageSize;
     }
 
-    public int getPageNum() {
-        return pageNum > 0 ? pageNum : 1;
+    public int getPage_num() {
+        return page_num > 0 ? page_num : 1;
     }
 
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
+    public void setPage_num(int pageNum) {
+        this.page_num = pageNum;
     }
 
     public List<Map<String, OrderType>> getOrders() {

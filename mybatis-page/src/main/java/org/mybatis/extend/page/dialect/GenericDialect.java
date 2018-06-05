@@ -79,7 +79,7 @@ public abstract class GenericDialect implements Dialect {
     }
 
     public PageList buildPageList(List resultList, Page page, int totalRows) {
-        return new PageList(resultList, page.getPageNum(), page.getPageSize(), totalRows);
+        return new PageList(resultList, page.getPage_num(), page.getPage_size(), totalRows);
     }
 
     public abstract String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey, List<Map<String, Page.OrderType>> orders);
