@@ -12,7 +12,7 @@ mybatis-generator-extend是对mbg做了一些拓展的一个小东西，可以�
 <repositories>
     <repository>
         <id>github-repository</id>
-        <url>https://raw.githubusercontent.com/BobJiangGit/mvn-repository/master</url>
+        <url>https://raw.githubusercontent.com/bob-jiang-git/mvn-repository/master</url>
     </repository>
 </repositories>
 ```
